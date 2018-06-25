@@ -274,7 +274,7 @@ public:
                 }
             #endif
         #elif defined( __LINUX__ )
-            pthread_setname_np( (pthread_t)GetCurrentThreadId(), name );
+            //pthread_setname_np( (pthread_t)GetCurrentThreadId(), name );
         #elif defined( __APPLE__ )
             pthread_setname_np( name );
         #else

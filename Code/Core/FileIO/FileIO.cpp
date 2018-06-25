@@ -30,6 +30,9 @@
 #if defined( __LINUX__ )
     #include <fcntl.h>
     #include <sys/sendfile.h>
+    #include <sys/types.h>
+    #include <utime.h>
+    #include <sys/time.h>
 #endif
 #if defined( __APPLE__ )
     #include <copyfile.h>
@@ -599,11 +602,12 @@
         t[1] = t[0];
         return ( utimes( fileName.Get(), t ) == 0 );
     #elif defined( __LINUX__ ) || defined( __APPLE__ )
-        struct timespec t[ 2 ];
+       struct timeval t[ 2 ];
         t[0].tv_sec = fileTime / 1000000000ULL;
-        t[0].tv_nsec = ( fileTime % 1000000000ULL );
+        ASSERT( ( ( fileTime % 1000000000ULL ) % 1000 ) == 0 ); // ensure no loss of accuracy
+        t[0].tv_usec = ( fileTime % 1000000000ULL ) / 1000;
         t[1] = t[0];
-        return ( utimensat( 0, fileName.Get(), t, 0 ) == 0 );
+        return ( utimes( fileName.Get(), t ) == 0 );  
     #else
         #error Unknown platform
     #endif

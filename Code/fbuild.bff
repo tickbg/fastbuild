@@ -25,6 +25,7 @@ Settings
     #endif
     #if __LINUX__
         .CachePath      = "/tmp/.fbuild.cache"
+        .Workers        = { "lonrs07895" }
     #endif
 }
 
@@ -78,12 +79,9 @@ Compiler( 'Compiler-x86Clang' )
 }
 Compiler( 'Compiler-x64-Linux' )
 {
-    .Executable     = '/usr/bin/gcc'
-    .ExtraFiles     = {
-                        '/usr/bin/as'
-                        '/usr/lib/gcc/x86_64-linux-gnu/4.9/cc1'
-                        '/usr/lib/gcc/x86_64-linux-gnu/4.9/cc1plus'
-                      }
+    ;.Executable     = '/usr/bin/g++'
+    .Executable     = '/opt/app/caf/tools/gcc/4.9.3/bin/g++'
+    .ExtraFiles     = { '/opt/app/caf/tools/gcc/4.9.3/libexec/gcc/x86_64-unknown-linux-gnu/4.9.3/cc1plus' }
 }
 Compiler( 'Compiler-x64-OSX' )
 {
@@ -390,10 +388,14 @@ Compiler( 'Compiler-x64-OSX' )
 .LinuxBaseConfig =
 [
     .Compiler               = 'Compiler-x64-Linux'
-    .Librarian              = '/usr/bin/ar'
-    .Linker                 = '/usr/bin/g++'
+    .Librarian              = '/apps/IRDtools/pkgs/pd/binutils/2.20.1/bin/ar'
+    .Linker                 = '/opt/app/caf/tools/gcc/4.9.3/bin/g++'
 
-    .BaseCompilerOptions    = '-o "%2" "%1" -c -g'
+    .BaseCompilerOptions    = ''
+
+                            + ' -include Core/Env/glibc_compat.h'
+
+                            + ' -o "%2" "%1" -c -g'
                             + ' -I./'
                             + ' -D__LINUX__'
                             + ' -Wall -Werror -Wfatal-errors'   // warnings as errors
@@ -410,7 +412,7 @@ Compiler( 'Compiler-x64-OSX' )
                             // Additional warnings
                             + ' -Wshadow'
 
-    .LinkerOptions          = '"%1" -o "%2"'
+    .LinkerOptions          = '-Wl,--wrap=memcpy "%1" -o "%2"'
 
     .LibrarianOptions       = 'rcs "%2" "%1"'
 
