@@ -344,6 +344,18 @@ const ConnectionInfo * TCPConnectionPool::Connect( uint32_t hostIP, uint16_t por
 
         if( FD_ISSET( sockfd, &write ) )
         {
+            int result;
+            socklen_t result_len = sizeof(result);
+            if (getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &result, &result_len) < 0)
+            {
+                CloseSocket(sockfd);
+                return nullptr;
+            }
+            if (result != 0)
+            {
+                CloseSocket(sockfd);
+                return nullptr;
+            }
             break; // connection success!
         }
 
