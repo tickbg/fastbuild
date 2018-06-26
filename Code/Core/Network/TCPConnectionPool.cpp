@@ -31,6 +31,7 @@
     #include <netinet/tcp.h>
     #include <fcntl.h>
     #include <unistd.h>
+    #include <signal.h>
     #define INVALID_SOCKET ( -1 )
     #define SOCKET_ERROR -1
     #if defined( __APPLE__ )
@@ -896,6 +897,16 @@ ConnectionInfo * TCPConnectionPool::CreateConnectionThread( TCPSocket socket, ui
 /*static*/ uint32_t TCPConnectionPool::ConnectionThreadWrapperFunction( void * data )
 {
     ConnectionInfo * ci = (ConnectionInfo *)data;
+#if defined( __APPLE__ ) || defined( __LINUX__ )
+    struct sigaction new_action, old_action;
+    new_action.sa_handler = SIG_IGN;
+    sigemptyset(&new_action.sa_mask);
+    new_action.sa_flags = 0;
+
+    sigaction(SIGPIPE, NULL, &old_action);
+    if ( old_action.sa_handler != SIG_IGN )
+        sigaction( SIGPIPE, &new_action, NULL );
+#endif
     ci->m_TCPConnectionPool->ConnectionThreadFunction( ci );
     return 0;
 }
