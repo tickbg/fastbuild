@@ -353,6 +353,11 @@ const ConnectionInfo * TCPConnectionPool::Connect( uint32_t hostIP, uint16_t por
             }
             if (result != 0)
             {
+            #ifdef TCPCONNECTION_DEBUG
+                AStackString<> host;
+                GetAddressAsString( hostIP, host );
+                TCPDEBUG( "connect() error: %i (host:%s port:%u)\n", GetLastError(), host.Get(), port );
+            #endif
                 CloseSocket(sockfd);
                 return nullptr;
             }
