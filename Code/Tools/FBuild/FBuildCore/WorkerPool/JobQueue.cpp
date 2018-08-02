@@ -357,6 +357,13 @@ Job * JobQueue::OnReturnRemoteJob( uint32_t jobId )
         // Are we still locally racing?
         if ( distState == Job::DIST_RACING )
         {
+            // TODO a temporary fix.
+            // Don't cancel local jobs, disgard remote work in case of local race.
+            // In case of a local race in some situations object file is corrupted. 
+            // This is still unclear, but the issue seems to be related to some buffered 
+            // object file content that still gets written after gcc is terminated.
+            return nullptr;
+
             // Try to cancel the local job
             job->Cancel();
             job->SetDistributionState( Job::DIST_RACE_WON_REMOTELY_CANCEL_LOCAL );
