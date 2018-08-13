@@ -109,9 +109,8 @@ int Main(int argc, char * argv[])
     // (when main process can acquire, final process has terminated)
     SystemMutex finalProcess( options.GetFinalProcessMutexName().Get() );
 
-    // only 1 instance running at a time
-    if ( ( wrapperMode == FBuildOptions::WRAPPER_MODE_MAIN_PROCESS ) ||
-         ( wrapperMode == FBuildOptions::WRAPPER_MODE_NONE ) )
+    // only 1 instance running at a time if -wrapper is set.
+    if ( wrapperMode == FBuildOptions::WRAPPER_MODE_MAIN_PROCESS )
     {
         if ( mainProcess.TryLock() == false )
         {

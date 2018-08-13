@@ -759,6 +759,15 @@ bool FBuild::DisplayDependencyDB( const Array< AString > & targets ) const
         // Use regular system temp path
         return FileIO::GetTempDir( outTempDir );
     #elif defined( __LINUX__ ) || defined( __APPLE__ )
+        if ( Env::GetEnvVariable( "FASTBUILD_TEMP_PATH", outTempDir ) )
+        {
+            // TempDir can be either /tmp or a subdir of /tmp
+            if ( !outTempDir.BeginsWith("/tmp") )
+            {
+                outTempDir = "/tmp/";
+            }
+            return true;
+        }
         outTempDir = "/tmp/";
         return true;
     #else
